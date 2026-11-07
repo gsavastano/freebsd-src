@@ -71,17 +71,19 @@
 /*
  * MAKENINES(n) turns n into (10**n)-1.  This is useful for converting a width
  * into a number that wide in decimal.
- * XXX: Overflows are not considered.
  */
-#define MAKENINES(n)							\
+#define	MAKENINES_MAX(n)	(sizeof(n) <= 4 ? 9U : 18U)
+#define	MAKENINES(n)							\
 	do {								\
 		intmax_t __i;						\
 									\
+		if ((size_t)(n) > MAKENINES_MAX(n))			\
+			(n) = MAKENINES_MAX(n);				\
 		/* Use a loop as all values of n are small. */		\
 		for (__i = 1; n > 0; __i *= 10)				\
 			n--;						\
 		n = __i - 1;						\
-	} while(0)
+	} while (0)
 
 static void	 display(const FTSENT *, FTSENT *, int);
 static int	 mastercmp(const FTSENT * const *, const FTSENT * const *);
@@ -784,10 +786,20 @@ display(const FTSENT *p, FTSENT *list, int options)
 		for (i = 0; i < LS_COLWIDTHS_FIELDS && *initmax != '\0'; i++) {
 			if (*initmax == ':') {
 				width[i] = 0;
+				initmax++;
 			} else {
-				width[i] = strtoul(initmax, &endp, 10);
+				while (isspace((unsigned char)*initmax))
+					initmax++;
+				if (*initmax == '-') {
+					(void)strtoul(initmax, &endp, 10);
+					width[i] = 0;
+				} else {
+					width[i] = strtoul(initmax, &endp, 10);
+					if (width[i] > MAXPATHLEN)
+						width[i] = 0;
+				}
 				initmax = endp;
-				while (isspace(*initmax))
+				while (isspace((unsigned char)*initmax))
 					initmax++;
 				if (*initmax != ':')
 					break;

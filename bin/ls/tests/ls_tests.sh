@@ -505,6 +505,25 @@ childerr_body()
 	    -e match:"Permission denied" ls -lR root
 }
 
+atf_test_case colwidths
+colwidths_head()
+{
+	atf_set "descr" "Verify LS_COLWIDTHS empty fields and negative/huge bounds"
+}
+
+colwidths_body()
+{
+	create_test_dir
+
+	atf_check -e empty -o empty -s exit:0 touch a b
+	atf_check -e empty -o match:'a[[:space:]]{19,}b' -s exit:0 \
+	    env COLUMNS=80 LS_COLWIDTHS=":::::::20" ls -C
+	atf_check -e empty -o match:'a[[:space:]]+b' -s exit:0 \
+	    env COLUMNS=80 LS_COLWIDTHS="0:0:0:0:0:0:0:-8" ls -C
+	atf_check -e empty -o match:'a[[:space:]]+b' -s exit:0 \
+	    env COLUMNS=80 LS_COLWIDTHS="99999999999999999999" ls -Ci
+}
+
 atf_test_case d_flag
 d_flag_head()
 {
@@ -1001,6 +1020,7 @@ atf_init_test_cases()
 	atf_add_test_case a_flag
 	atf_add_test_case b_flag
 	atf_add_test_case childerr
+	atf_add_test_case colwidths
 	#atf_add_test_case c_flag
 	atf_add_test_case d_flag
 	atf_add_test_case f_flag
