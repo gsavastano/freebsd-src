@@ -155,6 +155,7 @@ len_octal(const char *s, int len)
 		else
 			r += 4 * clen;
 		s += clen;
+		len -= (int)clen;
 	}
 	return (r);
 }

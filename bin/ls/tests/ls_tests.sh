@@ -179,6 +179,10 @@ B_flag_body()
 {
 	atf_check -e empty -o empty -s exit:0 touch "$(printf "y\013z")"
 	atf_check -e empty -o match:'y\\013z' -s exit:0 ls -B
+	if touch "$(printf "abcdef\342\202")" 2>/dev/null; then
+		atf_check -e empty -o match:'abcdef\\342\\202' -s exit:0 \
+		    env LC_ALL=en_US.UTF-8 COLUMNS=40 ls -CB
+	fi
 }
 
 atf_test_case C_flag
