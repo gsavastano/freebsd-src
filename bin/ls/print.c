@@ -104,7 +104,7 @@ static struct {
 #endif
 
 static size_t padding_for_month[12];
-static size_t month_max_size = 0;
+static ssize_t month_max_size = 0;
 
 void
 printscol(const DISPLAY *dp)
@@ -189,7 +189,7 @@ compute_abbreviated_month_size(void)
 			return;
 		}
 		months_width[i] = width;
-		if (width > month_max_size)
+		if ((ssize_t)width > month_max_size)
 			month_max_size = width;
 	}
 
