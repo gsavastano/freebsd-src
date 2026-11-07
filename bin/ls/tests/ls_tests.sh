@@ -247,6 +247,9 @@ D_flag_body()
 	atf_check -e empty -o empty -s exit:0 touch a.file
 	atf_check -e empty -o match:"$(stat -f '%c[[:space:]]+%N' a.file)" \
 	    -s exit:0 ls -lD '%s'
+	atf_check -e empty \
+	    -o match:"$(stat -f '%z[[:space:]]+%N$' a.file)" \
+	    -s exit:0 ls -lD "$(printf '%085d' 0)" a.file
 }
 
 atf_test_case F_flag

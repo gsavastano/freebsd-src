@@ -453,9 +453,10 @@ ls_strftime(char *str, size_t len, const char *fmt, const struct tm *tm)
 			format = nfmt;
 		}
 	}
-	if (tm != NULL)
-		strftime(str, len, format, tm);
-	else
+	if (tm != NULL) {
+		if (strftime(str, len, format, tm) == 0 && len > 0)
+			str[0] = '\0';
+	} else
 		strlcpy(str, "bad date val", len);
 }
 
